@@ -1,0 +1,8 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "daily-mind-tracker-seniors",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-26",
+  "assets": { "directory": "./public", "binding": "ASSETS" },
+  "d1_databases": [{ "binding": "DB", "database_name": "REPLACE_WITH_NEW_DATABASE_NAME", "database_id": "REPLACE_WITH_NEW_DATABASE_ID" }]
+}

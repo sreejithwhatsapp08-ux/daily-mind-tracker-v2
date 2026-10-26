@@ -1,0 +1,10 @@
+-- Fresh D1 schema for the new Daily Mind Tracker app. Run once on a NEW database.
+PRAGMA foreign_keys = ON;
+CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE COLLATE NOCASE, password_salt TEXT NOT NULL, password_hash TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'user' CHECK(role IN ('user','admin')), active INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0,1)), created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, token_hash TEXT NOT NULL UNIQUE, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, expires_at INTEGER NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE INDEX IF NOT EXISTS idx_sessions_token_expiry ON sessions(token_hash, expires_at);
+CREATE TABLE IF NOT EXISTS goal_settings (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, goal_name TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0,1)), UNIQUE(user_id, goal_name));
+CREATE TABLE IF NOT EXISTS daily_goals (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, goal_date TEXT NOT NULL, goal_id INTEGER NOT NULL REFERENCES goal_settings(id) ON DELETE CASCADE, completed INTEGER NOT NULL DEFAULT 0 CHECK(completed IN (0,1)), UNIQUE(user_id, goal_date, goal_id));
+CREATE TABLE IF NOT EXISTS mind_checkins (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, entry_date TEXT NOT NULL, hour INTEGER NOT NULL CHECK(hour BETWEEN 4 AND 22), mind_state TEXT NOT NULL CHECK(mind_state IN ('1','2','3','4','5')), thought_attention INTEGER NOT NULL DEFAULT 0 CHECK(thought_attention BETWEEN 0 AND 5), time_attention INTEGER NOT NULL DEFAULT 0 CHECK(time_attention BETWEEN 0 AND 5), updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(user_id, entry_date, hour));
+CREATE INDEX IF NOT EXISTS idx_checkins_user_date ON mind_checkins(user_id, entry_date, hour);
+CREATE INDEX IF NOT EXISTS idx_goals_user_date ON daily_goals(user_id, goal_date);
