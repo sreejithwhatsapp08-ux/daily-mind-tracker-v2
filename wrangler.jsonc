@@ -1,0 +1,18 @@
+
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "daily-mind-tracker-v2",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-26",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "daily-mind-tracker-db_v2",
+      "database_id": "77597c98-e3e7-4e9e-b02b-7dba36ce1ae8"
+    }
+  ]
+}
