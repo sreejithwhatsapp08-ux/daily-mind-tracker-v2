@@ -50,7 +50,7 @@ function renderCharts(checkins){
 function showPage(page,tab){['todayPage','checkinPage','settingsPage'].forEach(id=>document.getElementById(id)?.classList.toggle('hidden',id!==page));['todayTab','settingsTab'].forEach(id=>document.getElementById(id)?.classList.toggle('active',id===tab));document.getElementById('appHeader')?.classList.toggle('hidden',page==='checkinPage');document.getElementById('appNav')?.classList.toggle('hidden',page==='checkinPage')}
 function openCheckin(hour,state){
  selectedHour=hour;selectedState=(Number.isInteger(Number(state))&&Number(state)>=1&&Number(state)<=5?String(state):'3');
- const saved=dayData?.checkins.find(c=>c.hour===hour);
+ const saved=(dayData?.checkins||[]).find(c=>Number(c.hour)===Number(hour));
  selectedAttention={thought_attention:saved?.thought_attention||0,time_attention:saved?.time_attention||0};
  bulkCheckin=!saved;
  selectedHours=new Set();
@@ -94,7 +94,7 @@ async function saveCheckin(){
  try{
    for(const hour of hoursToSave){
      // Never overwrite a saved check-in during bulk fill.
-     if(bulkCheckin&&(dayData?.checkins||[]).some(c=>c.hour===hour))continue;
+     if(bulkCheckin&&(dayData?.checkins||[]).some(c=>Number(c.hour)===Number(hour)))continue;
      const r=await api(`/api/day/${date}/hour/${hour}`,{method:'PUT',body:JSON.stringify({mind_state:selectedState,...selectedAttention})});
      if(!r.ok){const x=await r.json();throw new Error(x.error||`Could not save ${LABEL(hour)} check-in`)}
    }
